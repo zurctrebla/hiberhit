@@ -1,0 +1,63 @@
+export default function HeroSection() {
+  const scrollToForm = () => {
+    const element = document.getElementById('orcamento');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0">
+        {/* Desktop Image - Optimized */}
+        <img 
+          src="https://readdy.ai/api/search-image?query=luxury%20modern%20minimalist%20living%20room%20with%20underfloor%20heating%20system%20elegant%20white%20interior%20design%20warm%20ambient%20lighting%20sophisticated%20architectural%20space%20premium%20residential%20interior%20clean%20lines%20natural%20light%20flowing%20through%20large%20windows%20comfortable%20seating%20area%20refined%20contemporary%20style%20high-end%20home%20comfort&width=1920&height=1080&seq=hero001&orientation=landscape"
+          alt="Piso Radiante Elétrico Premium IBERHIT - Conforto Térmico Absoluto"
+          className="hidden lg:block w-full h-full object-cover object-top"
+          width="1920"
+          height="1080"
+          loading="eager"
+          fetchpriority="high"
+        />
+        {/* Mobile Image - Optimized */}
+        <img 
+          src="https://readdy.ai/api/search-image?query=luxury%20modern%20minimalist%20living%20room%20with%20underfloor%20heating%20system%20elegant%20white%20interior%20design%20warm%20ambient%20lighting%20sophisticated%20architectural%20space%20premium%20residential%20interior%20clean%20lines%20natural%20light%20flowing%20through%20large%20windows%20comfortable%20seating%20area%20refined%20contemporary%20style%20high-end%20home%20comfort%20mobile%20optimized%20vertical%20composition&width=800&height=1200&seq=hero001mobile&orientation=portrait"
+          alt="Piso Radiante Elétrico Premium IBERHIT - Conforto Térmico Absoluto"
+          className="lg:hidden w-full h-full object-cover object-center"
+          style={{ maxHeight: '70vh' }}
+          width="800"
+          height="1200"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/35"></div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-12 text-center text-white py-32">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-6 leading-tight">
+          Acabe com o frio da sua casa <strong className="font-semibold">ainda este inverno</strong>
+        </h1>
+        
+        <p className="text-xl md:text-2xl font-light mb-12 max-w-4xl mx-auto leading-relaxed text-white/95">
+          Projetamos e instalamos piso radiante elétrico com tecnologia europeia comprovada — conforto térmico, eficiência energética e integração total com o seu projeto.
+        </p>
+
+        <div className="flex flex-col items-center gap-4">
+          <button
+            onClick={scrollToForm}
+            className="group px-10 py-5 bg-orange-600 text-white text-lg font-medium rounded-lg hover:bg-orange-700 transition-all transform hover:scale-105 cursor-pointer whitespace-nowrap shadow-2xl"
+          >
+            Solicitar Estudo Técnico Gratuito
+            <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform inline-block"></i>
+          </button>
+        </div>
+      </div>
+
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <i className="ri-arrow-down-line text-3xl text-white/80"></i>
+      </div>
+    </section>
+  );
+}
