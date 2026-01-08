@@ -18,6 +18,11 @@ interface QuoteRequest {
   orcamento_valor: number | null;
 }
 
+type QuotesApiResponse =
+  | { success: true; data: QuoteRequest[] }
+  | { success: false; error: string }
+  | any;
+
 export default function AdminDashboard() {
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
@@ -31,24 +36,32 @@ export default function AdminDashboard() {
       return;
     }
     fetchQuotes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, token, navigate]);
 
   const fetchQuotes = async () => {
+    setIsLoading(true);
+
     try {
       const response = await fetch(`${API_URL}/api/admin/quotes`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
+      const body: QuotesApiResponse = await response.json();
+
       if (!response.ok) {
-        throw new Error('Erro ao carregar orçamentos');
+        throw new Error(body?.error || 'Erro ao carregar orçamentos');
       }
 
-      const data = await response.json();
-      setQuotes(data.quotes || []);
+      // API retorna { success: true, data: [...] }
+      const list = Array.isArray(body) ? body : (body?.data ?? body?.quotes ?? []);
+      setQuotes(Array.isArray(list) ? list : []);
+      // console.log('quotes payload:', body);
     } catch (error) {
       console.error('Erro ao carregar orçamentos:', error);
+      setQuotes([]);
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +72,7 @@ export default function AdminDashboard() {
     navigate('/admin/login');
   };
 
-  const filteredQuotes = quotes.filter(quote => {
+  const filteredQuotes = quotes.filter((quote) => {
     if (filter === 'todos') return true;
     return quote.status === filter;
   });
@@ -116,7 +129,7 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Pedidos de Orçamento</h2>
-          
+
           <div className="flex gap-3 mb-6">
             <button
               onClick={() => setFilter('todos')}
@@ -136,7 +149,7 @@ export default function AdminDashboard() {
                   : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
               }`}
             >
-              Pendentes ({quotes.filter(q => q.status === 'pendente').length})
+              Pendentes ({quotes.filter((q) => q.status === 'pendente').length})
             </button>
             <button
               onClick={() => setFilter('em_analise')}
@@ -146,7 +159,7 @@ export default function AdminDashboard() {
                   : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
               }`}
             >
-              Em Análise ({quotes.filter(q => q.status === 'em_analise').length})
+              Em Análise ({quotes.filter((q) => q.status === 'em_analise').length})
             </button>
             <button
               onClick={() => setFilter('enviado')}
@@ -156,7 +169,7 @@ export default function AdminDashboard() {
                   : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
               }`}
             >
-              Enviados ({quotes.filter(q => q.status === 'enviado').length})
+              Enviados ({quotes.filter((q) => q.status === 'enviado').length})
             </button>
           </div>
         </div>
@@ -199,9 +212,7 @@ export default function AdminDashboard() {
                   {filteredQuotes.map((quote) => (
                     <tr
                       key={quote.id}
-                      className={`hover:bg-gray-50 transition-colors ${
-                        !quote.visualizado ? 'bg-blue-50' : ''
-                      }`}
+                      className={`hover:bg-gray-50 transition-colors ${!quote.visualizado ? 'bg-blue-50' : ''}`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(quote.created_at).toLocaleDateString('pt-PT')}
@@ -210,17 +221,15 @@ export default function AdminDashboard() {
                         <div className="text-sm font-medium text-gray-900">{quote.nome}</div>
                         <div className="text-sm text-gray-500">{quote.email}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {quote.localizacao}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {quote.tipo_imovel}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {quote.area}
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{quote.localizacao}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{quote.tipo_imovel}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{quote.area}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(quote.status)}`}>
+                        <span
+                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(
+                            quote.status
+                          )}`}
+                        >
                           {getStatusText(quote.status)}
                         </span>
                       </td>
