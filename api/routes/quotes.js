@@ -1,20 +1,33 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import pool from '../config/database.js';
 import { sendQuoteNotification } from '../services/email.js';
 
 const router = express.Router();
 
+/**
+ * Upload dir (pode vir do .env)
+ * - Se UPLOAD_DIR vier relativo (ex: ./uploads ou uploads), resolve para caminho absoluto
+ * - Garante que a pasta exista
+ */
+function resolveUploadDir() {
+  const raw = process.env.UPLOAD_DIR || 'uploads';
+  const dir = path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw);
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+const uploadDir = resolveUploadDir();
+
 // Configurar multer para upload de ficheiros
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    //cb(null, 'uploads/');
-    cb(null, process.env.UPLOAD_DIR || 'uploads/');
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    //const uniqueName = `${Date.now()}-${uuidv4()}${path.extname(file.name)}`;
     const ext = path.extname(file.originalname || '');
     const uniqueName = `${Date.now()}-${uuidv4()}${ext}`;
     cb(null, uniqueName);
@@ -26,22 +39,53 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|pdf|dwg|dxf/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    const extname = allowedTypes.test(path.extname(file.originalname || '').toLowerCase());
+    const mimetype = allowedTypes.test((file.mimetype || '').toLowerCase());
 
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
+    if (mimetype && extname) return cb(null, true);
     cb(new Error('Tipo de ficheiro não permitido'));
   }
 });
 
+/**
+ * Normaliza body para suportar:
+ * - multipart/form-data (multer)
+ * - application/json
+ *
+ * No multipart, tudo vem como string. Aqui a gente só normaliza boolean/number básicos.
+ */
+function normalizeBody(body) {
+  const out = { ...body };
+
+  // boolean mais comum
+  if (typeof out.possuiPlanta === 'string') {
+    const v = out.possuiPlanta.toLowerCase().trim();
+    out.possuiPlanta = v === 'true' || v === '1' || v === 'sim' || v === 'yes';
+  }
+
+  // área como número (se vier string)
+  if (typeof out.area === 'string' && out.area.trim() !== '') {
+    const n = Number(out.area.replace(',', '.'));
+    out.area = Number.isFinite(n) ? n : out.area;
+  }
+
+  return out;
+}
+
+function isMissing(v) {
+  if (v === undefined || v === null) return true;
+  if (typeof v === 'string' && v.trim() === '') return true;
+  return false;
+}
+
 // Submeter pedido de orçamento
 router.post('/submit', upload.single('planta'), async (req, res) => {
   const client = await pool.connect();
- 
+
   try {
     await client.query('BEGIN');
+
+    const body = normalizeBody(req.body || {});
 
     const {
       nome,
@@ -58,22 +102,22 @@ router.post('/submit', upload.single('planta'), async (req, res) => {
       tipoPavimento,
       possuiPlanta,
       observacoes
-    } = req.body;
+    } = body;
 
-    const requiredFields = ['nome', 'email','telemovel', 'localizacao', 'tipoImovel', 'exposicaoSolar', 'area', 'tipoPavimento', 'possuiPlanta'];
+    // Campos obrigatórios (do DB e do teu fluxo)
+    const requiredFields = [
+      'nome',
+      'email',
+      'telemovel',
+      'localizacao',
+      'tipoImovel',
+      'exposicaoSolar',
+      'area',
+      'tipoPavimento',
+      'possuiPlanta'
+    ];
 
-for (const f of requiredFields) {
-  const v = req.body?.[f];
-  const ok = typeof v === 'string' ? v.trim() !== '' : v !== undefined && v !== null;
-  if (!ok) {
-    await client.query('ROLLBACK');
-    return res.status(400).json({ success: false, error: `Campo obrigatório: ${f}` });
-  }
-}
-
-    const missing = Object.entries(requiredFields)
-      .filter(([_, v]) => v === undefined || v === null || v === '')
-      .map(([k]) => k);
+    const missing = requiredFields.filter((f) => isMissing(body[f]));
 
     if (missing.length) {
       await client.query('ROLLBACK');
@@ -83,35 +127,61 @@ for (const f of requiredFields) {
       });
     }
 
-    if (!nome || !email || !localizacao || !tipoImovel) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({
-        success: false,
-        error: 'Campos obrigatórios: nome, email, localizacao, tipoImovel'
-      });
-    }
-
     let plantaUrl = null;
     let plantaPath = null;
 
     if (req.file) {
       plantaPath = req.file.filename;
-      plantaUrl = `${process.env.API_URL || 'http://localhost:3001'}/uploads/${plantaPath}`;
+
+      // URL base correta (preferir domínio público se tiver no env)
+      const baseUrl =
+        process.env.API_PUBLIC_URL ||
+        process.env.API_URL ||
+        `https://landing.iberhit.com`;
+
+      plantaUrl = `${baseUrl.replace(/\/$/, '')}/uploads/${plantaPath}`;
     }
 
+    // OBS: os 4 últimos campos que tu tava repetindo (ultimoPiso/sinaisHumidade)
+    // estavam claramente “placeholder”. Mantive a ideia, mas sem duplicar campos errados.
+    // Ajusta esses defaults conforme teu front/DB.
     const result = await client.query(
       `INSERT INTO quote_requests (
         nome, email, telemovel, localizacao, tipo_imovel, ultimo_piso,
         exposicao_solar, nivel_isolamento, zona_fria, sinais_humidade,
         area, tipo_pavimento, possui_planta, observacoes, planta_url, planta_path,
         tipo_obra, piso_localizacao, zona_humida, vidros_duplos
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6,
+        $7, $8, $9, $10,
+        $11, $12, $13, $14, $15, $16,
+        $17, $18, $19, $20
+      )
       RETURNING *`,
       [
-        nome, email, telemovel, localizacao, tipoImovel, ultimoPiso,
-        exposicaoSolar, nivelIsolamento, zonaFria, sinaisHumidade,
-        area, tipoPavimento, possuiPlanta, observacoes, plantaUrl, plantaPath,
-        'Não especificado', ultimoPiso, sinaisHumidade, 'Não especificado'
+        nome,
+        email,
+        telemovel,
+        localizacao,
+        tipoImovel,
+        ultimoPiso ?? null,
+
+        exposicaoSolar,
+        nivelIsolamento ?? null,
+        zonaFria ?? null,
+        sinaisHumidade ?? null,
+
+        area,
+        tipoPavimento,
+        possuiPlanta,
+        observacoes ?? null,
+        plantaUrl,
+        plantaPath,
+
+        'Não especificado',
+        ultimoPiso ?? null,
+        'Não especificado',
+        'Não especificado'
       ]
     );
 
@@ -119,12 +189,12 @@ for (const f of requiredFields) {
 
     const quote = result.rows[0];
 
-    // Enviar notificação por email (não bloquear resposta)
-    sendQuoteNotification(quote).catch(err => 
-      console.error('Erro ao enviar email:', err)
+    // Email NÃO deve quebrar o request nem impedir gravar no DB
+    sendQuoteNotification(quote).catch((err) =>
+      console.error('❌ Erro ao enviar email:', err)
     );
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Pedido de orçamento recebido com sucesso!',
       data: {
@@ -133,11 +203,14 @@ for (const f of requiredFields) {
         email: quote.email
       }
     });
-
   } catch (error) {
-    await client.query('ROLLBACK');
+    // se der erro antes do COMMIT, rollback. se já comitou, rollback vai falhar; então try/catch aqui.
+    try {
+      await client.query('ROLLBACK');
+    } catch (_) {}
+
     console.error('Erro ao submeter orçamento:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao processar pedido'
     });

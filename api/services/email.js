@@ -110,6 +110,7 @@ export async function sendQuoteNotification(quote) {
     console.log('✅ Email de notificação enviado');
   } catch (error) {
     console.error('❌ Erro ao enviar email:', error);
+    throw new Error('Erro ao enviar email de notificação');
   }
 }
 

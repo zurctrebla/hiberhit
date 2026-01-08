@@ -3,14 +3,17 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
 import authRoutes from './routes/auth.js';
 import quoteRoutes from './routes/quotes.js';
 import adminRoutes from './routes/admin.js';
 
-dotenv.config({ path: '../.env' });
+// Carregar .env do projeto (/root/hiberhit/.env) de forma robusta,
+// independente do CWD que o PM2 usar.
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
 const app = express();
-const PORT = process.env.API_PORT || 3001;
+const PORT = Number(process.env.API_PORT || process.env.PORT || 3001);
 
 // Middleware de segurança
 app.use(helmet());
@@ -31,8 +34,9 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir ficheiros estáticos (uploads)
-app.use('/uploads', express.static('uploads'));
+// Servir ficheiros estáticos (uploads) - caminho absoluto para não depender do CWD
+const uploadsDir = path.resolve(process.cwd(), 'uploads'); // /root/hiberhit/api/uploads (se CWD=api)
+app.use('/uploads', express.static(uploadsDir));
 
 // Rotas
 app.use('/api/auth', authRoutes);
@@ -53,7 +57,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 API rodando em http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 API rodando em http://0.0.0.0:${PORT}`);
   console.log(`📊 Ambiente: ${process.env.NODE_ENV || 'development'}`);
 });
