@@ -31,6 +31,7 @@ export default function OrcamentoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
+
   const [quote, setQuote] = useState<QuoteDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
@@ -43,14 +44,21 @@ export default function OrcamentoDetail() {
       navigate('/admin/login');
       return;
     }
+    if (!id) {
+      setIsLoading(false);
+      setQuote(null);
+      return;
+    }
     fetchQuoteDetail();
-  }, [id, token, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, token]);
 
   const fetchQuoteDetail = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/admin/quotes/${id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -58,17 +66,28 @@ export default function OrcamentoDetail() {
         throw new Error('Erro ao carregar orçamento');
       }
 
-      const data = await response.json();
-      setQuote(data.quote);
-      
-      if (data.quote.orcamento_valor) {
-        setOrcamentoValor(data.quote.orcamento_valor.toString());
-      }
-      if (data.quote.orcamento_observacoes) {
-        setOrcamentoObservacoes(data.quote.orcamento_observacoes);
-      }
+      const payload = await response.json();
+
+      // ✅ backend pode devolver:
+      // - { success: true, data: {...} }
+      // - { success: true, quote: {...} }
+      // - { ...direto... }
+      const q: QuoteDetail | null =
+        (payload?.data as QuoteDetail) ??
+        (payload?.quote as QuoteDetail) ??
+        (payload?.quotes?.[0] as QuoteDetail) ??
+        null;
+
+      setQuote(q);
+
+      if (q?.orcamento_valor != null) setOrcamentoValor(String(q.orcamento_valor));
+      else setOrcamentoValor('');
+
+      if (q?.orcamento_observacoes) setOrcamentoObservacoes(q.orcamento_observacoes);
+      else setOrcamentoObservacoes('');
     } catch (error) {
       console.error('Erro ao carregar orçamento:', error);
+      setQuote(null);
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +98,7 @@ export default function OrcamentoDetail() {
       const response = await fetch(`${API_URL}/api/admin/quotes/${id}/status`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: newStatus }),
@@ -107,7 +126,7 @@ export default function OrcamentoDetail() {
       const response = await fetch(`${API_URL}/api/admin/quotes/${id}/send`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -131,33 +150,6 @@ export default function OrcamentoDetail() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">A carregar...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!quote) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Orçamento não encontrado</p>
-          <button
-            onClick={() => navigate('/admin/dashboard')}
-            className="mt-4 text-teal-600 hover:text-teal-700 font-medium"
-          >
-            Voltar ao Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   const getStatusBadge = (status: string) => {
     const styles = {
       pendente: 'bg-yellow-100 text-yellow-800',
@@ -175,6 +167,40 @@ export default function OrcamentoDetail() {
     };
     return texts[status as keyof typeof texts] || status;
   };
+
+  const resolvePlantaHref = (url: string) => {
+    // se já vier absoluto, usa direto. se vier /uploads/..., usa direto (mesmo host).
+    if (/^https?:\/\//i.test(url)) return url;
+    if (url.startsWith('/')) return url;
+    return `/uploads/${url}`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">A carregar...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!quote?.id) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Orçamento não encontrado</p>
+          <button
+            onClick={() => navigate('/admin/dashboard')}
+            className="mt-4 text-teal-600 hover:text-teal-700 font-medium"
+          >
+            Voltar ao Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -198,16 +224,21 @@ export default function OrcamentoDetail() {
                 Pedido de Orçamento #{quote.id.slice(0, 8)}
               </h1>
               <p className="text-sm text-gray-600">
-                Recebido em {new Date(quote.created_at).toLocaleDateString('pt-PT', {
+                Recebido em{' '}
+                {new Date(quote.created_at).toLocaleDateString('pt-PT', {
                   day: '2-digit',
                   month: 'long',
                   year: 'numeric',
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
                 })}
               </p>
             </div>
-            <span className={`px-4 py-2 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusBadge(quote.status)}`}>
+            <span
+              className={`px-4 py-2 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusBadge(
+                quote.status
+              )}`}
+            >
               {getStatusText(quote.status)}
             </span>
           </div>
@@ -296,9 +327,10 @@ export default function OrcamentoDetail() {
               <div>
                 <span className="text-sm text-gray-600">Possui Planta:</span>
                 <p className="text-sm font-medium text-gray-900 mb-2">{quote.possui_planta}</p>
+
                 {quote.planta_url && (
                   <a
-                    href={`${API_URL}${quote.planta_url}`}
+                    href={resolvePlantaHref(quote.planta_url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-sm text-teal-600 hover:text-teal-700 font-medium whitespace-nowrap"
@@ -329,7 +361,7 @@ export default function OrcamentoDetail() {
                   Marcar como Em Análise
                 </button>
               )}
-              
+
               {quote.status !== 'enviado' && (
                 <button
                   onClick={() => setShowSendForm(!showSendForm)}
@@ -339,7 +371,7 @@ export default function OrcamentoDetail() {
                 </button>
               )}
 
-              {quote.status === 'enviado' && quote.orcamento_valor && (
+              {quote.status === 'enviado' && quote.orcamento_valor != null && (
                 <div className="w-full bg-green-50 border border-green-200 rounded-lg p-4">
                   <p className="text-sm font-semibold text-green-800 mb-2">
                     Orçamento Enviado: €{quote.orcamento_valor.toFixed(2)}
@@ -356,7 +388,7 @@ export default function OrcamentoDetail() {
         {showSendForm && (
           <div className="bg-white rounded-lg shadow-sm p-8">
             <h3 className="text-lg font-bold text-gray-900 mb-6">Enviar Orçamento</h3>
-            
+
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
