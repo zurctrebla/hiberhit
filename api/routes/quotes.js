@@ -10,10 +10,13 @@ const router = express.Router();
 // Configurar multer para upload de ficheiros
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    //cb(null, 'uploads/');
+    cb(null, process.env.UPLOAD_DIR || 'uploads/');
   },
   filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${uuidv4()}${path.extname(file.name)}`;
+    //const uniqueName = `${Date.now()}-${uuidv4()}${path.extname(file.name)}`;
+    const ext = path.extname(file.originalname || '');
+    const uniqueName = `${Date.now()}-${uuidv4()}${ext}`;
     cb(null, uniqueName);
   }
 });
@@ -36,7 +39,7 @@ const upload = multer({
 // Submeter pedido de orçamento
 router.post('/submit', upload.single('planta'), async (req, res) => {
   const client = await pool.connect();
-  
+ 
   try {
     await client.query('BEGIN');
 
@@ -56,6 +59,37 @@ router.post('/submit', upload.single('planta'), async (req, res) => {
       possuiPlanta,
       observacoes
     } = req.body;
+
+    const requiredFields = ['nome', 'email','telemovel', 'localizacao', 'tipoImovel', 'exposicaoSolar', 'area', 'tipoPavimento', 'possuiPlanta'];
+
+for (const f of requiredFields) {
+  const v = req.body?.[f];
+  const ok = typeof v === 'string' ? v.trim() !== '' : v !== undefined && v !== null;
+  if (!ok) {
+    await client.query('ROLLBACK');
+    return res.status(400).json({ success: false, error: `Campo obrigatório: ${f}` });
+  }
+}
+
+    const missing = Object.entries(requiredFields)
+      .filter(([_, v]) => v === undefined || v === null || v === '')
+      .map(([k]) => k);
+
+    if (missing.length) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        error: `Campos obrigatórios: ${missing.join(', ')}`
+      });
+    }
+
+    if (!nome || !email || !localizacao || !tipoImovel) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        error: 'Campos obrigatórios: nome, email, localizacao, tipoImovel'
+      });
+    }
 
     let plantaUrl = null;
     let plantaPath = null;
