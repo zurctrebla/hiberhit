@@ -1,3 +1,7 @@
 .env
 /node_modules
 /dist
+/out
+default
+.env_old
+
