@@ -8,30 +8,26 @@ import { sendQuoteNotification } from '../services/email.js';
 
 const router = express.Router();
 
-/**
- * Upload dir (pode vir do .env)
- * - Se UPLOAD_DIR vier relativo (ex: ./uploads ou uploads), resolve para caminho absoluto
- * - Garante que a pasta exista
- */
-function resolveUploadDir() {
-  const raw = process.env.UPLOAD_DIR || 'uploads';
-  const dir = path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw);
-  fs.mkdirSync(dir, { recursive: true });
-  return dir;
-}
+const UPLOAD_DIR = process.env.UPLOAD_DIR || 'uploads';
 
-const uploadDir = resolveUploadDir();
+// garantir que a pasta existe
+function ensureDir(dir) {
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+  } catch (_) {}
+}
 
 // Configurar multer para upload de ficheiros
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir);
+    ensureDir(UPLOAD_DIR);
+    cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname || '');
     const uniqueName = `${Date.now()}-${uuidv4()}${ext}`;
     cb(null, uniqueName);
-  }
+  },
 });
 
 const upload = multer({
@@ -44,97 +40,72 @@ const upload = multer({
 
     if (mimetype && extname) return cb(null, true);
     cb(new Error('Tipo de ficheiro não permitido'));
-  }
+  },
 });
 
+// Multer só quando for multipart
 const maybeUpload = (req, res, next) => {
-  const ct = req.headers['content-type'] || '';
+  const ct = (req.headers['content-type'] || '').toLowerCase();
   if (ct.includes('multipart/form-data')) {
     return upload.single('planta')(req, res, next);
   }
   return next();
 };
 
-
-/**
- * Normaliza body para suportar:
- * - multipart/form-data (multer)
- * - application/json
- *
- * No multipart, tudo vem como string. Aqui a gente só normaliza boolean/number básicos.
- */
-function normalizeBody(body) {
-  const out = { ...body };
-
-  // boolean mais comum
-  if (typeof out.possuiPlanta === 'string') {
-    const v = out.possuiPlanta.toLowerCase().trim();
-    out.possuiPlanta = v === 'true' || v === '1' || v === 'sim' || v === 'yes';
-  }
-
-  // área como número (se vier string)
-  if (typeof out.area === 'string' && out.area.trim() !== '') {
-    const n = Number(out.area.replace(',', '.'));
-    out.area = Number.isFinite(n) ? n : out.area;
-  }
-
-  return out;
-}
-
-function isMissing(v) {
-  if (v === undefined || v === null) return true;
-  if (typeof v === 'string' && v.trim() === '') return true;
-  return false;
+function isPresent(v) {
+  if (v === undefined || v === null) return false;
+  if (typeof v === 'string') return v.trim() !== '';
+  return true;
 }
 
 // Submeter pedido de orçamento
-// router.post('/submit', upload.single('planta'), async (req, res) => {
 router.post('/submit', maybeUpload, async (req, res) => {
-
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
 
-    const body = normalizeBody(req.body || {});
+    const body = req.body || {};
 
-    const {
-      nome,
-      email,
-      telemovel,
-      localizacao,
-      tipoImovel,
-      ultimoPiso,
-      exposicaoSolar,
-      nivelIsolamento,
-      zonaFria,
-      sinaisHumidade,
-      area,
-      tipoPavimento,
-      possuiPlanta,
-      observacoes
-    } = body;
+    // Aceitar camelCase e snake_case (front manda snake_case, curl às vezes camelCase)
+    const normalized = {
+      // obrigatórios no DB
+      nome: body.nome,
+      email: body.email,
+      localizacao: body.localizacao,
+      tipo_imovel: body.tipo_imovel ?? body.tipoImovel,
+      exposicao_solar: body.exposicao_solar ?? body.exposicaoSolar,
+      area: body.area,
+      tipo_pavimento: body.tipo_pavimento ?? body.tipoPavimento,
+      possui_planta: body.possui_planta ?? body.possuiPlanta,
 
-    // Campos obrigatórios (do DB e do teu fluxo)
-    const requiredFields = [
+      // opcionais no DB
+      telemovel: body.telemovel,
+      ultimo_piso: body.ultimo_piso ?? body.ultimoPiso,
+      nivel_isolamento: body.nivel_isolamento ?? body.nivelIsolamento,
+      zona_fria: body.zona_fria ?? body.zonaFria,
+      sinais_humidade: body.sinais_humidade ?? body.sinaisHumidade,
+      observacoes: body.observacoes,
+    };
+
+    // required conforme teu schema SQL (NOT NULL)
+    const required = [
       'nome',
       'email',
-      'telemovel',
       'localizacao',
-      'tipoImovel',
-      'exposicaoSolar',
+      'tipo_imovel',
+      'exposicao_solar',
       'area',
-      'tipoPavimento',
-      'possuiPlanta'
+      'tipo_pavimento',
+      'possui_planta',
     ];
 
-    const missing = requiredFields.filter((f) => isMissing(body[f]));
-
+    const missing = required.filter((k) => !isPresent(normalized[k]));
     if (missing.length) {
       await client.query('ROLLBACK');
       return res.status(400).json({
         success: false,
-        error: `Campos obrigatórios: ${missing.join(', ')}`
+        error: `Campos obrigatórios: ${missing.join(', ')}`,
       });
     }
 
@@ -143,19 +114,14 @@ router.post('/submit', maybeUpload, async (req, res) => {
 
     if (req.file) {
       plantaPath = req.file.filename;
-
-      // URL base correta (preferir domínio público se tiver no env)
+      // API_URL opcional, cai pro domínio atual se não tiver
       const baseUrl =
-        process.env.API_PUBLIC_URL ||
         process.env.API_URL ||
-        `https://landing.iberhit.com`;
-
-      plantaUrl = `${baseUrl.replace(/\/$/, '')}/uploads/${plantaPath}`;
+        `${req.protocol}://${req.get('host')}`;
+      plantaUrl = `${baseUrl}/uploads/${plantaPath}`;
     }
 
-    // OBS: os 4 últimos campos que tu tava repetindo (ultimoPiso/sinaisHumidade)
-    // estavam claramente “placeholder”. Mantive a ideia, mas sem duplicar campos errados.
-    // Ajusta esses defaults conforme teu front/DB.
+    // INSERT alinhado com schema (snake_case)
     const result = await client.query(
       `INSERT INTO quote_requests (
         nome, email, telemovel, localizacao, tipo_imovel, ultimo_piso,
@@ -163,36 +129,36 @@ router.post('/submit', maybeUpload, async (req, res) => {
         area, tipo_pavimento, possui_planta, observacoes, planta_url, planta_path,
         tipo_obra, piso_localizacao, zona_humida, vidros_duplos
       ) VALUES (
-        $1, $2, $3, $4, $5, $6,
-        $7, $8, $9, $10,
-        $11, $12, $13, $14, $15, $16,
-        $17, $18, $19, $20
+        $1,$2,$3,$4,$5,$6,
+        $7,$8,$9,$10,
+        $11,$12,$13,$14,$15,$16,
+        $17,$18,$19,$20
       )
       RETURNING *`,
       [
-        nome,
-        email,
-        telemovel,
-        localizacao,
-        tipoImovel,
-        ultimoPiso ?? null,
+        normalized.nome,
+        normalized.email,
+        normalized.telemovel ?? null,
+        normalized.localizacao,
+        normalized.tipo_imovel,
+        normalized.ultimo_piso ?? null,
 
-        exposicaoSolar,
-        nivelIsolamento ?? null,
-        zonaFria ?? null,
-        sinaisHumidade ?? null,
+        normalized.exposicao_solar,
+        normalized.nivel_isolamento ?? null,
+        normalized.zona_fria ?? null,
+        normalized.sinais_humidade ?? null,
 
-        area,
-        tipoPavimento,
-        possuiPlanta,
-        observacoes ?? null,
+        normalized.area,
+        normalized.tipo_pavimento,
+        normalized.possui_planta,
+        normalized.observacoes ?? null,
         plantaUrl,
         plantaPath,
 
         'Não especificado',
-        ultimoPiso ?? null,
+        normalized.ultimo_piso ?? null,
+        normalized.sinais_humidade ?? null,
         'Não especificado',
-        'Não especificado'
       ]
     );
 
@@ -200,10 +166,10 @@ router.post('/submit', maybeUpload, async (req, res) => {
 
     const quote = result.rows[0];
 
-    // Email NÃO deve quebrar o request nem impedir gravar no DB
-    sendQuoteNotification(quote).catch((err) =>
-      console.error('❌ Erro ao enviar email:', err)
-    );
+    // email não bloqueia resposta
+    sendQuoteNotification(quote).catch((err) => {
+      console.error('❌ Erro ao enviar email:', err);
+    });
 
     return res.json({
       success: true,
@@ -211,11 +177,10 @@ router.post('/submit', maybeUpload, async (req, res) => {
       data: {
         id: quote.id,
         nome: quote.nome,
-        email: quote.email
-      }
+        email: quote.email,
+      },
     });
   } catch (error) {
-    // se der erro antes do COMMIT, rollback. se já comitou, rollback vai falhar; então try/catch aqui.
     try {
       await client.query('ROLLBACK');
     } catch (_) {}
@@ -223,7 +188,7 @@ router.post('/submit', maybeUpload, async (req, res) => {
     console.error('Erro ao submeter orçamento:', error);
     return res.status(500).json({
       success: false,
-      error: 'Erro ao processar pedido'
+      error: 'Erro ao processar pedido',
     });
   } finally {
     client.release();
