@@ -44,7 +44,9 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Servir uploads (caminho relativo ao CWD do PM2 /root/hiberhit/api)
-app.use('/uploads', express.static(process.env.UPLOAD_DIR || 'uploads'));
+// app.use('/uploads', express.static(process.env.UPLOAD_DIR || 'uploads'));
+const UPLOAD_DIR = process.env.UPLOAD_DIR || '/mnt/volume_lon1_01/uploads/public';
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Rotas
 app.use('/api/auth', authRoutes);

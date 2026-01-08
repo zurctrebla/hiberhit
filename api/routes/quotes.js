@@ -8,7 +8,8 @@ import { sendQuoteNotification } from '../services/email.js';
 
 const router = express.Router();
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || 'uploads';
+// const UPLOAD_DIR = process.env.UPLOAD_DIR || 'uploads';
+const UPLOAD_DIR = process.env.UPLOAD_DIR || '/mnt/volume_lon1_01/uploads/public';
 
 // garantir que a pasta existe
 function ensureDir(dir) {
@@ -18,16 +19,23 @@ function ensureDir(dir) {
 }
 
 // Configurar multer para upload de ficheiros
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     ensureDir(UPLOAD_DIR);
+//     cb(null, UPLOAD_DIR);
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = path.extname(file.originalname || '');
+//     const uniqueName = `${Date.now()}-${uuidv4()}${ext}`;
+//     cb(null, uniqueName);
+//   },
+// });
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    ensureDir(UPLOAD_DIR);
-    cb(null, UPLOAD_DIR);
-  },
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname || '');
-    const uniqueName = `${Date.now()}-${uuidv4()}${ext}`;
-    cb(null, uniqueName);
-  },
+    cb(null, `${Date.now()}-${uuidv4()}${ext}`);
+  }
 });
 
 const upload = multer({
