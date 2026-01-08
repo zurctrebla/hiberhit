@@ -47,6 +47,15 @@ const upload = multer({
   }
 });
 
+const maybeUpload = (req, res, next) => {
+  const ct = req.headers['content-type'] || '';
+  if (ct.includes('multipart/form-data')) {
+    return upload.single('planta')(req, res, next);
+  }
+  return next();
+};
+
+
 /**
  * Normaliza body para suportar:
  * - multipart/form-data (multer)
@@ -79,7 +88,9 @@ function isMissing(v) {
 }
 
 // Submeter pedido de orçamento
-router.post('/submit', upload.single('planta'), async (req, res) => {
+// router.post('/submit', upload.single('planta'), async (req, res) => {
+router.post('/submit', maybeUpload, async (req, res) => {
+
   const client = await pool.connect();
 
   try {
