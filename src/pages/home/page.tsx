@@ -9,6 +9,7 @@ import QuoteFormSection from './components/QuoteFormSection';
 import FinalCTASection from './components/FinalCTASection';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
+import WhatsAppButton from '../../components/feature/WhatsAppButton';
 
 export default function HomePage() {
   return (
@@ -23,6 +24,7 @@ export default function HomePage() {
       <FinalCTASection />
       <QuoteFormSection />
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 }

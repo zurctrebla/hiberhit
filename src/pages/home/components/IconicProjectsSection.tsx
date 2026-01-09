@@ -277,9 +277,6 @@ export default function IconicProjectsSection() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                     
                     <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                      <div className="inline-block px-3 py-1 bg-orange-600 text-white text-sm font-medium rounded-full mb-4" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                        {String((index % projects.length) + 1).padStart(2, '0')}
-                      </div>
                       <h3 className="text-3xl font-light mb-2" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>{project.title}</h3>
                       <p className="text-orange-400 text-sm mb-4 flex items-center gap-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                         <i className="ri-map-pin-line"></i>

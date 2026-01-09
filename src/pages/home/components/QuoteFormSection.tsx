@@ -20,8 +20,11 @@ export default function QuoteFormSection() {
     observacoes: ''
   });
   const [plantaFile, setPlantaFile] = useState<File | null>(null);
+  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [showConsentError, setShowConsentError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -36,6 +39,19 @@ export default function QuoteFormSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // GDPR validation: block submission if consent not given
+    if (!privacyConsent) {
+      setShowConsentError(true);
+      // Scroll to consent checkbox
+      const consentElement = document.getElementById('privacy-consent');
+      if (consentElement) {
+        consentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    setShowConsentError(false);
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
@@ -79,6 +95,7 @@ export default function QuoteFormSection() {
         observacoes: ''
       });
       setPlantaFile(null);
+      setPrivacyConsent(false);
       
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
@@ -90,6 +107,35 @@ export default function QuoteFormSection() {
     }
   };
 
+  const openPrivacyPolicy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Trigger the Privacy Policy modal in Footer
+    const privacyButton = document.querySelector('[data-modal="privacidade"]') as HTMLButtonElement;
+    if (privacyButton) {
+      privacyButton.click();
+    }
+  };
+
+  const Tooltip = ({ id, text }: { id: string; text: string }) => (
+    <div className="relative inline-block ml-2">
+      <button
+        type="button"
+        onMouseEnter={() => setActiveTooltip(id)}
+        onMouseLeave={() => setActiveTooltip(null)}
+        onClick={() => setActiveTooltip(activeTooltip === id ? null : id)}
+        className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition-colors cursor-pointer"
+      >
+        <i className="ri-information-line text-xs text-gray-600"></i>
+      </button>
+      {activeTooltip === id && (
+        <div className="absolute z-10 w-72 p-3 bg-gray-900 text-white text-xs leading-relaxed rounded-lg shadow-xl -top-2 left-8">
+          <div className="absolute w-2 h-2 bg-gray-900 transform rotate-45 -left-1 top-3"></div>
+          {text}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <section id="orcamento" className="py-24 bg-white">
       <div className="max-w-4xl mx-auto px-6">
@@ -97,8 +143,11 @@ export default function QuoteFormSection() {
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Peça o Seu Orçamento Gratuito
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 mb-3">
             Preencha o formulário e receba uma proposta personalizada em 24 horas
+          </p>
+          <p className="text-base text-orange-700 font-medium">
+            <strong>Instalação profissional incluída</strong> em projetos adjudicados até 28/02/2026
           </p>
         </div>
 
@@ -189,8 +238,12 @@ export default function QuoteFormSection() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                 Último Piso?
+                <Tooltip 
+                  id="ultimo-piso"
+                  text="Os imóveis situados no último piso estão mais expostos a perdas térmicas, sobretudo quando não existe isolamento adequado na cobertura. Esta informação é essencial para dimensionar corretamente o sistema de aquecimento."
+                />
               </label>
               <select
                 name="ultimo_piso"
@@ -207,8 +260,12 @@ export default function QuoteFormSection() {
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                 Exposição Solar *
+                <Tooltip 
+                  id="exposicao-solar"
+                  text="A orientação solar influencia significativamente os ganhos térmicos naturais do espaço. Ambientes com menor exposição solar tendem a necessitar de maior potência de aquecimento."
+                />
               </label>
               <select
                 name="exposicao_solar"
@@ -227,8 +284,12 @@ export default function QuoteFormSection() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                 Nível de Isolamento
+                <Tooltip 
+                  id="nivel-isolamento"
+                  text="O nível de isolamento do imóvel (paredes, janelas e caixilharias) é um dos fatores mais importantes no desempenho térmico. Um bom isolamento reduz o consumo energético e melhora o conforto."
+                />
               </label>
               <select
                 name="nivel_isolamento"
@@ -247,8 +308,12 @@ export default function QuoteFormSection() {
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                 Zona Fria?
+                <Tooltip 
+                  id="zona-fria"
+                  text="Alguns espaços da habitação podem apresentar temperaturas mais baixas devido à sua localização, orientação ou contacto com zonas não aquecidas. Identificar estas áreas permite uma solução mais eficiente."
+                />
               </label>
               <select
                 name="zona_fria"
@@ -264,8 +329,12 @@ export default function QuoteFormSection() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                 Sinais de Humidade?
+                <Tooltip 
+                  id="sinais-humidade"
+                  text="A presença de humidade pode afetar o conforto térmico e a sensação de frio. Esta informação ajuda-nos a avaliar corretamente o comportamento térmico do espaço."
+                />
               </label>
               <select
                 name="sinais_humidade"
@@ -367,6 +436,50 @@ export default function QuoteFormSection() {
             />
           </div>
 
+          {/* GDPR: Data Purpose Statement */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-gray-700 leading-relaxed">
+              <i className="ri-information-line text-blue-600 mr-2"></i>
+              Os seus dados pessoais serão utilizados exclusivamente para processar o seu pedido de orçamento e entrar em contacto consigo, conforme descrito na nossa Política de Privacidade.
+            </p>
+          </div>
+
+          {/* GDPR: Required Privacy Consent Checkbox */}
+          <div id="privacy-consent" className="mb-6">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={privacyConsent}
+                onChange={(e) => {
+                  setPrivacyConsent(e.target.checked);
+                  if (e.target.checked) {
+                    setShowConsentError(false);
+                  }
+                }}
+                className="mt-1 w-5 h-5 rounded border-gray-300 text-teal-600 focus:ring-2 focus:ring-teal-500 cursor-pointer"
+              />
+              <span className="text-sm text-gray-700 leading-relaxed">
+                Li e aceito a{' '}
+                <button
+                  type="button"
+                  onClick={openPrivacyPolicy}
+                  className="text-teal-600 hover:text-teal-700 underline font-medium cursor-pointer"
+                >
+                  Política de Privacidade
+                </button>
+                {' '}*
+              </span>
+            </label>
+            
+            {/* Validation Error Message */}
+            {showConsentError && (
+              <div className="mt-2 flex items-start gap-2 text-red-600 text-sm">
+                <i className="ri-error-warning-line mt-0.5"></i>
+                <span>Deve aceitar a Política de Privacidade para enviar o pedido de orçamento.</span>
+              </div>
+            )}
+          </div>
+
           {submitStatus === 'success' && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-green-800 text-sm">
@@ -383,13 +496,15 @@ export default function QuoteFormSection() {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-          >
-            {isSubmitting ? 'A enviar...' : 'Enviar Pedido de Orçamento'}
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full md:w-auto max-w-[90%] md:max-w-none px-6 md:px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-lg flex items-center justify-center"
+            >
+              {isSubmitting ? 'A enviar...' : 'Enviar Pedido de Orçamento'}
+            </button>
+          </div>
         </form>
       </div>
     </section>

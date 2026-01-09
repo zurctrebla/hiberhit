@@ -11,19 +11,19 @@ export default function TrustSection() {
       <div className="max-w-6xl mx-auto px-6 lg:px-12">
         <div className="bg-white rounded-3xl shadow-xl p-12 md:p-16 border border-orange-100">
           <h2 className="text-4xl md:text-5xl font-light text-black mb-6">
-            <strong className="font-semibold">Instalação técnica profissional</strong> incluída por tempo limitado
+            <strong className="font-semibold">Instalação profissional incluída</strong> — oferta exclusiva de inverno
           </h2>
 
           <p className="text-lg md:text-xl text-orange-800 font-medium leading-relaxed mb-8">
-            Campanha especial IBERHIT • Janeiro e Fevereiro
+            Campanha especial IBERHIT • Janeiro e Fevereiro 2026
           </p>
 
           <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-10 max-w-4xl">
-            Durante a campanha de inverno, a IBERHIT oferece a instalação técnica profissional como cortesia para sistemas de piso radiante elétrico adjudicados durante os meses de janeiro e fevereiro.
+            Durante a campanha de inverno, a IBERHIT <strong>oferece a instalação técnica profissional completa</strong> como cortesia para sistemas de piso radiante elétrico adjudicados durante os meses de janeiro e fevereiro.
           </p>
 
           <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-10 max-w-4xl">
-            Esta condição especial garante um acompanhamento técnico rigoroso, desde a análise e dimensionamento do sistema até à execução final, assegurando conforto térmico, eficiência energética e total integração com o projeto.
+            Esta oferta exclusiva garante um acompanhamento técnico rigoroso, desde a análise e dimensionamento do sistema até à execução final, assegurando conforto térmico, eficiência energética e total integração com o projeto — <strong>sem custos adicionais de instalação</strong>.
           </p>
 
           <button
@@ -36,7 +36,7 @@ export default function TrustSection() {
 
           {/* Legal Disclaimer */}
           <p className="text-xs text-gray-500 mt-8 leading-relaxed">
-            Promoção válida para pedidos adjudicados até 28/02/2025, mediante confirmação técnica e disponibilidade de agenda.
+            Promoção válida para pedidos adjudicados até 28/02/2026, mediante confirmação técnica e disponibilidade de agenda.
           </p>
         </div>
       </div>

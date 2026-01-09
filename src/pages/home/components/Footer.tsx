@@ -210,11 +210,8 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center bg-orange-600 rounded-lg">
-                  <i className="ri-fire-line text-2xl text-white"></i>
-                </div>
-                <span className="text-2xl font-semibold">IBERHIT</span>
+              <div className="flex items-center mb-6">
+                <h2 className="text-3xl font-bold text-white">IBERHIT</h2>
               </div>
               <p className="text-gray-300 leading-relaxed mb-6">
                 A IBERHIT desenvolve e integra soluções técnicas para vivendas, apartamentos e edifícios, aliando aquecimento, iluminação, climatização e tecnologias inteligentes a uma abordagem focada na eficiência energética, conforto e sustentabilidade.
@@ -354,7 +351,8 @@ export default function Footer() {
               <p className="text-sm text-gray-300">
                 © 2025 IBERHIT – Premium Solution Systems. Todos os direitos reservados.
               </p>
-              <a 
+              <a
+                hidden 
                 href="https://readdy.ai/?ref=logo"
                 target="_blank"
                 rel="noopener noreferrer"

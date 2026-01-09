@@ -25,28 +25,28 @@ export default function FinalCTASection() {
 
       <div className="max-w-5xl mx-auto px-6 lg:px-12 relative z-10">
         {/* Card Principal */}
-        <div className="bg-white rounded-2xl shadow-2xl p-10 md:p-14 relative">
+        <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-10 lg:p-14 relative">
           {/* Badge de Urgência */}
           <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
             <div className="bg-orange-600 text-white px-6 py-2 rounded-full shadow-lg flex items-center gap-2">
               <i className="ri-time-line text-lg"></i>
-              <span className="text-sm font-semibold whitespace-nowrap">Válido até 28/02/2026</span>
+              <span className="text-sm font-semibold whitespace-nowrap">Oferta válida até 28/02/2026</span>
             </div>
           </div>
 
           {/* Conteúdo */}
           <div className="text-center mt-4">
-            <h2 className="text-3xl md:text-4xl font-light text-black mb-3">
-              Instalação Profissional Incluída — <strong className="font-semibold">Campanha de Inverno</strong>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-light text-black mb-3">
+              <strong className="font-semibold">Instalação Profissional Incluída</strong> — Campanha de Inverno
             </h2>
             
-            <p className="text-lg text-gray-700 mb-8 max-w-3xl mx-auto">
-              Instalação técnica profissional integrada na solução, com acompanhamento especializado.
+            <p className="text-base md:text-lg text-gray-700 mb-8 max-w-3xl mx-auto">
+              Instalação técnica profissional completa integrada na solução, <strong>sem custos adicionais</strong>, com acompanhamento especializado do início ao fim.
             </p>
 
-            <div className="bg-gray-50 rounded-xl p-8 mb-8 text-left">
-              <p className="text-base text-gray-800 leading-relaxed mb-6">
-                Durante os meses de janeiro e fevereiro, a IBERHIT inclui a instalação técnica profissional dos sistemas de piso radiante elétrico, garantindo um processo rigoroso desde a análise e dimensionamento até à execução final da obra.
+            <div className="bg-gray-50 rounded-xl p-6 md:p-8 mb-8 text-left">
+              <p className="text-sm md:text-base text-gray-800 leading-relaxed mb-6">
+                Durante os meses de janeiro e fevereiro, a IBERHIT <strong>oferece a instalação técnica profissional completa</strong> dos sistemas de piso radiante elétrico, garantindo um processo rigoroso desde a análise e dimensionamento até à execução final da obra — <strong>totalmente incluída, sem custos extra</strong>.
               </p>
 
               {/* Benefícios */}
@@ -55,8 +55,8 @@ export default function FinalCTASection() {
                   <div className="w-6 h-6 flex items-center justify-center bg-green-100 rounded-full flex-shrink-0 mt-0.5">
                     <i className="ri-check-line text-green-600 text-sm"></i>
                   </div>
-                  <p className="text-gray-800 text-base">
-                    Instalação profissional e acompanhamento técnico especializado
+                  <p className="text-gray-800 text-sm md:text-base">
+                    <strong>Instalação profissional completa incluída</strong> — sem custos adicionais de mão de obra
                   </p>
                 </div>
 
@@ -64,7 +64,16 @@ export default function FinalCTASection() {
                   <div className="w-6 h-6 flex items-center justify-center bg-green-100 rounded-full flex-shrink-0 mt-0.5">
                     <i className="ri-check-line text-green-600 text-sm"></i>
                   </div>
-                  <p className="text-gray-800 text-base">
+                  <p className="text-gray-800 text-sm md:text-base">
+                    Acompanhamento técnico especializado do início ao fim do projeto
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 flex items-center justify-center bg-green-100 rounded-full flex-shrink-0 mt-0.5">
+                    <i className="ri-check-line text-green-600 text-sm"></i>
+                  </div>
+                  <p className="text-gray-800 text-sm md:text-base">
                     Solução dimensionada de acordo com as características do seu imóvel
                   </p>
                 </div>
@@ -73,7 +82,7 @@ export default function FinalCTASection() {
                   <div className="w-6 h-6 flex items-center justify-center bg-green-100 rounded-full flex-shrink-0 mt-0.5">
                     <i className="ri-check-line text-green-600 text-sm"></i>
                   </div>
-                  <p className="text-gray-800 text-base">
+                  <p className="text-gray-800 text-sm md:text-base">
                     Proposta técnica personalizada entregue em até 48h úteis
                   </p>
                 </div>
@@ -81,15 +90,17 @@ export default function FinalCTASection() {
             </div>
 
             {/* CTA */}
-            <button
-              onClick={scrollToForm}
-              className="px-10 py-4 bg-orange-600 text-white text-lg font-medium rounded-lg hover:bg-orange-700 transition-all transform hover:scale-105 cursor-pointer whitespace-nowrap shadow-lg mb-3"
-            >
-              Receber Proposta Técnica
-            </button>
+            <div className="flex justify-center mb-3">
+              <button
+                onClick={scrollToForm}
+                className="w-full md:w-auto max-w-[90%] md:max-w-none px-6 md:px-10 py-4 bg-orange-600 text-white text-base md:text-lg font-medium rounded-lg hover:bg-orange-700 transition-all transform hover:scale-105 cursor-pointer whitespace-nowrap shadow-lg flex items-center justify-center"
+              >
+                Receber Proposta Técnica
+              </button>
+            </div>
 
             <p className="text-sm text-gray-600">
-              Análise técnica sem compromisso.
+              Análise técnica sem compromisso. Instalação profissional incluída.
             </p>
 
             {/* Aviso Legal */}
