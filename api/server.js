@@ -69,7 +69,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app
+const server = app
   .listen(PORT, HOST, () => {
     console.log(`🚀 API rodando em http://${HOST}:${PORT}`);
     console.log(`📊 Ambiente: ${process.env.NODE_ENV || 'development'}`);
@@ -78,3 +78,34 @@ app
     console.error('❌ Falha ao iniciar servidor:', err);
     process.exit(1);
   });
+
+// Graceful shutdown
+const gracefulShutdown = (signal) => {
+  console.log(`\n⚠️  Recebido ${signal}. Encerrando gracefully...`);
+
+  server.close(() => {
+    console.log('✅ Servidor HTTP encerrado');
+    process.exit(0);
+  });
+
+  // Force shutdown após 10 segundos
+  setTimeout(() => {
+    console.error('❌ Forçando encerramento após timeout');
+    process.exit(1);
+  }, 10000);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Capturar erros não tratados
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection:', reason);
+  // Não encerrar processo, apenas logar
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  // Encerrar processo em caso de exceção não tratada
+  process.exit(1);
+});
