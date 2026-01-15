@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { uploadPrivateFile, getPrivateFileUrl, uploadBuffer, deleteFile, getContentType } from '../services/spaces.js';
-import { verifyToken } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -42,7 +42,7 @@ const upload = multer({
  * Upload de documento privado (requer autenticação)
  * Usa Digital Ocean Spaces se configurado, caso contrário usa storage local
  */
-router.post('/document', verifyToken, upload.single('file'), async (req, res) => {
+router.post('/document', authenticateToken, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Nenhum arquivo enviado' });
@@ -114,7 +114,7 @@ router.post('/document', verifyToken, upload.single('file'), async (req, res) =>
  * Gera URL temporária para download de documento privado
  * Requer autenticação
  */
-router.get('/document/:fileKey(*)', verifyToken, async (req, res) => {
+router.get('/document/:fileKey(*)', authenticateToken, async (req, res) => {
   try {
     const fileKey = req.params.fileKey;
 
@@ -161,7 +161,7 @@ router.get('/document/:fileKey(*)', verifyToken, async (req, res) => {
  * Upload de anexo para orçamento (PDF, imagens, etc.)
  * Requer autenticação
  */
-router.post('/attachment', verifyToken, upload.single('file'), async (req, res) => {
+router.post('/attachment', authenticateToken, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Nenhum arquivo enviado' });
@@ -229,7 +229,7 @@ router.post('/attachment', verifyToken, upload.single('file'), async (req, res) 
  * Deleta um arquivo
  * Requer autenticação de admin
  */
-router.delete('/:fileKey(*)', verifyToken, async (req, res) => {
+router.delete('/:fileKey(*)', authenticateToken, async (req, res) => {
   try {
     const fileKey = req.params.fileKey;
 
