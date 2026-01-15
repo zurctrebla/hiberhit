@@ -45,7 +45,7 @@ export default function ProductsSection() {
         'Pavimentos vinílicos ou laminados',
         'Projectos de reabilitação com altura limitada'
       ],
-      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/pelicula-radiante-ecofilm.webp',
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/pelicula-radiante-ecofilm.jpg',
       imageAlt: 'Película radiante ECOFILM',
       imagePosition: 'right'
     }
