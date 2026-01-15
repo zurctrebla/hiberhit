@@ -20,6 +20,7 @@ interface QuoteDetail {
   area: string;
   tipo_pavimento: string;
   possui_planta: string;
+  planta_path: string | null;
   planta_url: string | null;
   observacoes: string;
   status: string;
@@ -175,6 +176,32 @@ export default function OrcamentoDetail() {
     return `/uploads/${url}`;
   };
 
+  const handleDownloadPlanta = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/admin/quotes/${id}/planta`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        alert('Erro ao gerar URL de download da planta');
+        return;
+      }
+
+      const data = await response.json();
+      if (data.success && data.downloadUrl) {
+        // Abre em nova aba
+        window.open(data.downloadUrl, '_blank');
+      } else {
+        alert('Erro ao obter URL da planta');
+      }
+    } catch (error) {
+      console.error('Erro ao baixar planta:', error);
+      alert('Erro ao baixar planta');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -328,16 +355,14 @@ export default function OrcamentoDetail() {
                 <span className="text-sm text-gray-600">Possui Planta:</span>
                 <p className="text-sm font-medium text-gray-900 mb-2">{quote.possui_planta}</p>
 
-                {quote.planta_url && (
-                  <a
-                    href={resolvePlantaHref(quote.planta_url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                {(quote.planta_path || quote.planta_url) && (
+                  <button
+                    onClick={handleDownloadPlanta}
                     className="inline-flex items-center text-sm text-teal-600 hover:text-teal-700 font-medium whitespace-nowrap"
                   >
                     <i className="ri-download-line mr-2"></i>
                     Descarregar Planta
-                  </a>
+                  </button>
                 )}
               </div>
             </div>
