@@ -9,7 +9,7 @@ export default function ProductsSection() {
         'Áreas com layouts irregulares ou zonas de difícil acesso',
         'Pavimentos cerâmicos, pedra natural e mármore'
       ],
-      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/cabo-radiante.png',
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/cabo-radiante.jpg',
       imageAlt: 'Sistema de cabo radiante',
       imagePosition: 'left'
     },
@@ -21,7 +21,7 @@ export default function ProductsSection() {
         'Sob pavimentos cerâmicos, mármore e similares',
         'Pode funcionar como aquecimento principal ou aquecimento auxiliar (piso morno)'
       ],
-      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/esteira-radiante.webp',
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/esteira-radiante.jpg',
       imageAlt: 'Esteira radiante elétrica instalada sob pavimento – sistema de aquecimento por piso radiante',
       imagePosition: 'right'
     },
@@ -33,7 +33,7 @@ export default function ProductsSection() {
         'Quartos, salas e áreas residenciais',
         'Pavimentos flutuantes: vinílico, laminado e madeira natural'
       ],
-      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/manta-al-radiante.png',
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/manta-al-radiante.jpg',
       imageAlt: 'Manta radiante em alumínio instalada sob pavimento flutuante em quarto moderno',
       imagePosition: 'left'
     },
