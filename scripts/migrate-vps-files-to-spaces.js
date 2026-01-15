@@ -113,8 +113,7 @@ async function migrateFile(quoteId, plantaPath, vpsBasePath) {
     await pool.query(
       `UPDATE quote_requests
        SET planta_path = $1,
-           planta_url = NULL,
-           updated_at = NOW()
+           planta_url = NULL
        WHERE id = $2`,
       [newKey, quoteId]
     );
