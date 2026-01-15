@@ -2,6 +2,8 @@ import express from 'express';
 import pool from '../config/database.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { sendQuoteToClient, sendTestEmail } from '../services/email.js';
+import { getPrivateFileUrl } from '../services/spaces.js';
+import path from 'path';
 
 const router = express.Router();
 
@@ -210,6 +212,87 @@ router.post('/test-email', async (req, res) => {
     return res.status(500).json({
       success: false,
       error: err?.message || 'Falha ao enviar email',
+    });
+  }
+});
+
+// Gerar URL temporária para download de planta
+router.get('/quotes/:id/planta', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Busca o orçamento para pegar o planta_path
+    const result = await pool.query(
+      'SELECT planta_path, planta_url FROM quote_requests WHERE id = $1',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Orçamento não encontrado',
+      });
+    }
+
+    const { planta_path, planta_url } = result.rows[0];
+
+    if (!planta_path) {
+      return res.status(404).json({
+        success: false,
+        error: 'Este orçamento não possui planta anexada',
+      });
+    }
+
+    // Verifica se está usando Spaces
+    const useSpaces = process.env.DO_SPACES_KEY && process.env.DO_SPACES_SECRET;
+
+    if (useSpaces && planta_path.startsWith('admin/')) {
+      // Arquivo no Spaces - gera URL assinada (válida por 1 hora)
+      try {
+        const downloadUrl = await getPrivateFileUrl(planta_path, 3600);
+
+        return res.json({
+          success: true,
+          downloadUrl,
+          expiresIn: 3600,
+          storage: 'spaces',
+        });
+      } catch (error) {
+        console.error('Erro ao gerar URL assinada:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Erro ao gerar URL de download',
+        });
+      }
+    } else {
+      // Arquivo local - retorna URL direta
+      if (planta_url) {
+        return res.json({
+          success: true,
+          downloadUrl: planta_url,
+          expiresIn: null,
+          storage: 'local',
+        });
+      } else {
+        // Gera URL local se não tiver
+        const baseUrl =
+          process.env.API_URL ||
+          `${req.protocol}://${req.get('host')}`;
+        const downloadUrl = `${baseUrl}/uploads/${planta_path}`;
+
+        return res.json({
+          success: true,
+          downloadUrl,
+          expiresIn: null,
+          storage: 'local',
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao obter planta:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Erro ao obter planta',
     });
   }
 });

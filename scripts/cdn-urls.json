@@ -1,0 +1,26 @@
+{
+  "hero": {
+    "hero-desktop.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/hero/hero-desktop.jpg",
+    "hero-mobile.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/hero/hero-mobile.jpg"
+  },
+  "products": {
+    "cabo-radiante.png": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/cabo-radiante.png",
+    "esteira-radiante.webp": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/esteira-radiante.webp",
+    "manta-al-radiante.png": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/manta-al-radiante.png",
+    "pelicula-radiante-ecofilm.webp": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/pelicula-radiante-ecofilm.webp"
+  },
+  "authority": {
+    "equipa-tecnica.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/authority/equipa-tecnica.jpg"
+  },
+  "projects": {
+    "edificio-intempo.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/edificio-intempo.jpg",
+    "heliporto-hospitalar.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/heliporto-hospitalar.jpg",
+    "hotel-k2.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/hotel-k2.jpg",
+    "mnac.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/mnac.jpg",
+    "park-hyatt.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/park-hyatt.jpg",
+    "sagrada-familia.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/sagrada-familia.jpg",
+    "san-marco.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/san-marco.jpg",
+    "torre-agbar.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/torre-agbar.jpg",
+    "zoo-barcelona.jpg": "https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/zoo-barcelona.jpg"
+  }
+}

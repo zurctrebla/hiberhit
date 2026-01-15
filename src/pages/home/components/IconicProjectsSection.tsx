@@ -15,55 +15,55 @@ export default function IconicProjectsSection() {
       title: 'Hotel de Lujo K2',
       location: 'Courchevel, França',
       description: 'Hotel de luxo de 5 estrelas nas montanhas francesas. Sistema de piso radiante elétrico instalado em todas as suítes premium, áreas comuns e spa, proporcionando conforto térmico excepcional mesmo nas condições mais extremas do inverno alpino.',
-      image: 'https://readdy.ai/api/search-image?query=luxury%20five%20star%20alpine%20hotel%20interior%20elegant%20lobby%20with%20premium%20heated%20floors%20sophisticated%20mountain%20resort%20design%20warm%20ambient%20lighting%20refined%20contemporary%20architecture%20high-end%20hospitality%20space%20comfortable%20seating%20areas%20natural%20stone%20and%20wood%20elements%20exclusive%20winter%20destination&width=1200&height=800&seq=iconic001&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/hotel-k2.jpg'
     },
     {
       title: 'MNAC - Museu Nacional',
       location: 'Barcelona, Espanha',
       description: 'Museu Nacional de Arte da Catalunha. Implementação de sistema de climatização por piso radiante em galerias históricas, garantindo temperatura estável para preservação de obras de arte e conforto dos visitantes, respeitando a arquitetura centenária.',
-      image: 'https://readdy.ai/api/search-image?query=prestigious%20national%20art%20museum%20interior%20gallery%20with%20heated%20floors%20elegant%20exhibition%20space%20classical%20architecture%20refined%20lighting%20sophisticated%20climate%20control%20system%20comfortable%20viewing%20environment%20preserved%20historical%20building%20modern%20heating%20technology%20cultural%20heritage%20space&width=1200&height=800&seq=iconic002&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/mnac.jpg'
     },
     {
       title: 'Torre Agbar',
       location: 'Barcelona, Espanha',
       description: 'Edifício icónico de Barcelona com 38 andares. Sistema de piso radiante elétrico integrado em escritórios corporativos e áreas executivas, oferecendo eficiência energética e conforto térmico em um dos edifícios mais emblemáticos da cidade.',
-      image: 'https://readdy.ai/api/search-image?query=modern%20iconic%20skyscraper%20office%20interior%20with%20underfloor%20heating%20elegant%20corporate%20workspace%20contemporary%20design%20sophisticated%20business%20environment%20premium%20heated%20floors%20floor-to-ceiling%20windows%20city%20views%20refined%20professional%20space%20high-end%20commercial%20building&width=1200&height=800&seq=iconic003&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/torre-agbar.jpg'
     },
     {
       title: 'Basílica de San Marco',
       location: 'Veneza, Itália',
       description: 'Basílica histórica de Veneza. Instalação cuidadosa de sistema de aquecimento radiante para proteção contra humidade e preservação dos mosaicos milenares, mantendo temperatura ideal sem comprometer a integridade estrutural do monumento.',
-      image: 'https://readdy.ai/api/search-image?query=historic%20venetian%20basilica%20interior%20with%20climate%20control%20elegant%20religious%20architecture%20ancient%20mosaics%20preserved%20heritage%20sophisticated%20heating%20system%20warm%20ambient%20lighting%20cultural%20monument%20refined%20restoration%20work%20comfortable%20worship%20space&width=1200&height=800&seq=iconic004&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/san-marco.jpg'
     },
     {
       title: 'Hotel Park Hyatt',
       location: 'Paris, França',
       description: 'Hotel de luxo 5 estrelas no coração de Paris. Piso radiante elétrico premium instalado em todas as suítes, spa de luxo e áreas VIP, proporcionando experiência térmica incomparável aos hóspedes mais exigentes da capital francesa.',
-      image: 'https://readdy.ai/api/search-image?query=luxury%20parisian%20five%20star%20hotel%20suite%20interior%20elegant%20bedroom%20with%20premium%20heated%20floors%20sophisticated%20french%20design%20refined%20contemporary%20style%20warm%20ambient%20lighting%20high-end%20hospitality%20comfortable%20living%20space%20exclusive%20accommodation%20marble%20bathroom&width=1200&height=800&seq=iconic005&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/park-hyatt.jpg'
     },
     {
       title: 'Sagrada Família',
       location: 'Barcelona, Espanha',
       description: 'Basílica projetada por Gaudí. Sistema de climatização radiante implementado em áreas específicas para conforto dos visitantes e proteção do património, respeitando o design arquitetónico único e as necessidades de conservação da obra-prima modernista.',
-      image: 'https://readdy.ai/api/search-image?query=gaudi%20masterpiece%20basilica%20interior%20with%20climate%20control%20elegant%20religious%20architecture%20colorful%20stained%20glass%20windows%20sophisticated%20heating%20system%20warm%20lighting%20cultural%20heritage%20space%20comfortable%20visitor%20environment%20preserved%20modernist%20design&width=1200&height=800&seq=iconic006&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/sagrada-familia.jpg'
     },
     {
       title: 'Edifício Intempo',
       location: 'Benidorm, Espanha',
       description: 'Arranha-céus residencial de luxo com 47 andares. Piso radiante elétrico instalado em apartamentos premium e áreas comuns, oferecendo conforto térmico e eficiência energética em uma das torres residenciais mais altas da Europa.',
-      image: 'https://readdy.ai/api/search-image?query=luxury%20high-rise%20residential%20apartment%20interior%20with%20underfloor%20heating%20elegant%20modern%20living%20space%20floor-to-ceiling%20windows%20sea%20views%20sophisticated%20design%20premium%20heated%20floors%20contemporary%20architecture%20comfortable%20home%20environment%20high-end%20residential%20tower&width=1200&height=800&seq=iconic007&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/edificio-intempo.jpg'
     },
     {
       title: 'Zoo Barcelona',
       location: 'Barcelona, Espanha',
       description: 'Zoológico de Barcelona. Sistema de aquecimento radiante instalado em pavilhões de animais exóticos e áreas de visitantes, garantindo temperatura controlada para bem-estar animal e conforto dos visitantes durante todo o ano.',
-      image: 'https://readdy.ai/api/search-image?query=modern%20zoo%20pavilion%20interior%20with%20climate%20control%20elegant%20animal%20habitat%20sophisticated%20heating%20system%20comfortable%20visitor%20area%20natural%20lighting%20educational%20space%20wildlife%20conservation%20facility%20warm%20environment%20professional%20zoo%20design&width=1200&height=800&seq=iconic008&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/zoo-barcelona.jpg'
     },
     {
       title: 'Deshielo - Helipuerto Hospitales',
       location: 'Espanha',
       description: 'Heliporto hospitalar com sistema anti-gelo. Piso radiante elétrico de alta potência instalado para garantir operação segura em condições climáticas adversas, permitindo pousos e descolagens de emergência 24/7 independentemente das condições meteorológicas.',
-      image: 'https://readdy.ai/api/search-image?query=hospital%20helipad%20with%20anti-ice%20heating%20system%20modern%20medical%20facility%20rooftop%20landing%20pad%20sophisticated%20underfloor%20heating%20technology%20safe%20emergency%20operations%20winter%20conditions%20professional%20healthcare%20infrastructure%20heated%20surface%20snow-free%20landing%20area&width=1200&height=800&seq=iconic009&orientation=landscape'
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/projects/heliporto-hospitalar.jpg'
     }
   ];
 

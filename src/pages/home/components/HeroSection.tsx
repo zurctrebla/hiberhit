@@ -10,8 +10,8 @@ export default function HeroSection() {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
         {/* Desktop Image - Optimized */}
-        <img 
-          src="https://readdy.ai/api/search-image?query=luxury%20modern%20minimalist%20living%20room%20with%20underfloor%20heating%20system%20elegant%20white%20interior%20design%20warm%20ambient%20lighting%20sophisticated%20architectural%20space%20premium%20residential%20interior%20clean%20lines%20natural%20light%20flowing%20through%20large%20windows%20comfortable%20seating%20area%20refined%20contemporary%20style%20high-end%20home%20comfort&width=1920&height=1080&seq=hero001&orientation=landscape"
+        <img
+          src="https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/hero/hero-desktop.jpg"
           alt="Piso Radiante Elétrico Premium IBERHIT - Conforto Térmico Absoluto"
           className="hidden lg:block w-full h-full object-cover object-top"
           width="1920"
@@ -20,8 +20,8 @@ export default function HeroSection() {
           fetchpriority="high"
         />
         {/* Mobile Image - Optimized */}
-        <img 
-          src="https://readdy.ai/api/search-image?query=luxury%20modern%20minimalist%20living%20room%20with%20underfloor%20heating%20system%20elegant%20white%20interior%20design%20warm%20ambient%20lighting%20sophisticated%20architectural%20space%20premium%20residential%20interior%20clean%20lines%20natural%20light%20flowing%20through%20large%20windows%20comfortable%20seating%20area%20refined%20contemporary%20style%20high-end%20home%20comfort%20mobile%20optimized%20vertical%20composition&width=800&height=1200&seq=hero001mobile&orientation=portrait"
+        <img
+          src="https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/hero/hero-mobile.jpg"
           alt="Piso Radiante Elétrico Premium IBERHIT - Conforto Térmico Absoluto"
           className="lg:hidden w-full h-full object-cover object-center"
           style={{ maxHeight: '70vh' }}

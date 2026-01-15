@@ -8,7 +8,7 @@ export default function AuthoritySection() {
           <div className="relative">
             <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
               <img
-                src="https://readdy.ai/api/search-image?query=professional%20technical%20team%20installing%20electric%20radiant%20floor%20heating%20system%20modern%20construction%20site%20clean%20organized%20workspace%20european%20quality%20standards%20technical%20precision&width=800&height=600&seq=tech-team-001&orientation=landscape"
+                src="https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/authority/equipa-tecnica.jpg"
                 alt="Equipa técnica IBERHIT"
                 className="w-full h-full object-cover object-top"
               />

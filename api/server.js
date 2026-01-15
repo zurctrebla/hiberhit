@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import quoteRoutes from './routes/quotes.js';
 import adminRoutes from './routes/admin.js';
+import uploadsRoutes from './routes/uploads.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +53,7 @@ app.use('/uploads', express.static(UPLOAD_DIR));
 app.use('/api/auth', authRoutes);
 app.use('/api/quotes', quoteRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/uploads', uploadsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

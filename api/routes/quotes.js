@@ -5,6 +5,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import pool from '../config/database.js';
 import { sendQuoteNotification } from '../services/email.js';
+import { uploadBuffer, getContentType } from '../services/spaces.js';
 
 const router = express.Router();
 
@@ -19,24 +20,8 @@ function ensureDir(dir) {
 }
 
 // Configurar multer para upload de ficheiros
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     ensureDir(UPLOAD_DIR);
-//     cb(null, UPLOAD_DIR);
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = path.extname(file.originalname || '');
-//     const uniqueName = `${Date.now()}-${uuidv4()}${ext}`;
-//     cb(null, uniqueName);
-//   },
-// });
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname || '');
-    cb(null, `${Date.now()}-${uuidv4()}${ext}`);
-  }
-});
+// Usar memória para fazer upload direto para Spaces
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
@@ -121,12 +106,54 @@ router.post('/submit', maybeUpload, async (req, res) => {
     let plantaPath = null;
 
     if (req.file) {
-      plantaPath = req.file.filename;
-      // API_URL opcional, cai pro domínio atual se não tiver
-      const baseUrl =
-        process.env.API_URL ||
-        `${req.protocol}://${req.get('host')}`;
-      plantaUrl = `${baseUrl}/uploads/${plantaPath}`;
+      // Verifica se Spaces está configurado
+      const useSpaces = process.env.DO_SPACES_KEY && process.env.DO_SPACES_SECRET;
+
+      if (useSpaces) {
+        // Upload para Digital Ocean Spaces (PRIVADO)
+        try {
+          const ext = path.extname(req.file.originalname || '');
+          const uniqueName = `${Date.now()}-${uuidv4()}${ext}`;
+          const key = `admin/plantas/${uniqueName}`;
+
+          // Upload do buffer para Spaces (privado)
+          await uploadBuffer(
+            req.file.buffer,
+            key,
+            req.file.mimetype,
+            false // privado
+          );
+
+          // Salva apenas a chave (key) - URL será gerada sob demanda
+          plantaPath = key;
+          plantaUrl = null; // Não gera URL pública, será gerada via API
+        } catch (uploadError) {
+          console.error('❌ Erro ao fazer upload para Spaces:', uploadError);
+          // Se falhar, continua sem planta
+          plantaPath = null;
+          plantaUrl = null;
+        }
+      } else {
+        // Fallback: salva localmente
+        try {
+          ensureDir(UPLOAD_DIR);
+          const ext = path.extname(req.file.originalname || '');
+          const uniqueName = `${Date.now()}-${uuidv4()}${ext}`;
+          const filepath = path.join(UPLOAD_DIR, uniqueName);
+
+          fs.writeFileSync(filepath, req.file.buffer);
+
+          plantaPath = uniqueName;
+          const baseUrl =
+            process.env.API_URL ||
+            `${req.protocol}://${req.get('host')}`;
+          plantaUrl = `${baseUrl}/uploads/${plantaPath}`;
+        } catch (localError) {
+          console.error('❌ Erro ao salvar arquivo localmente:', localError);
+          plantaPath = null;
+          plantaUrl = null;
+        }
+      }
     }
 
     // INSERT alinhado com schema (snake_case)

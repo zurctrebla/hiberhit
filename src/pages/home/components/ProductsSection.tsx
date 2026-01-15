@@ -9,7 +9,7 @@ export default function ProductsSection() {
         'Áreas com layouts irregulares ou zonas de difícil acesso',
         'Pavimentos cerâmicos, pedra natural e mármore'
       ],
-      image: 'https://static.readdy.ai/image/281988da53201d204713e913280346d2/a8ba1ee2c748a38ad93c5fa6e6d3a57f.png',
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/cabo-radiante.png',
       imageAlt: 'Sistema de cabo radiante',
       imagePosition: 'left'
     },
@@ -21,7 +21,7 @@ export default function ProductsSection() {
         'Sob pavimentos cerâmicos, mármore e similares',
         'Pode funcionar como aquecimento principal ou aquecimento auxiliar (piso morno)'
       ],
-      image: 'https://static.readdy.ai/image/281988da53201d204713e913280346d2/32d35110ac63fe6f71f3e53d0dee5b66.webp',
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/esteira-radiante.webp',
       imageAlt: 'Esteira radiante elétrica instalada sob pavimento – sistema de aquecimento por piso radiante',
       imagePosition: 'right'
     },
@@ -33,7 +33,7 @@ export default function ProductsSection() {
         'Quartos, salas e áreas residenciais',
         'Pavimentos flutuantes: vinílico, laminado e madeira natural'
       ],
-      image: 'https://static.readdy.ai/image/281988da53201d204713e913280346d2/7a3f6b14dfc9600d381a7103669dc02f.png',
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/manta-al-radiante.png',
       imageAlt: 'Manta radiante em alumínio instalada sob pavimento flutuante em quarto moderno',
       imagePosition: 'left'
     },
@@ -45,7 +45,7 @@ export default function ProductsSection() {
         'Pavimentos vinílicos ou laminados',
         'Projectos de reabilitação com altura limitada'
       ],
-      image: 'https://static.readdy.ai/image/281988da53201d204713e913280346d2/f32824d6503ad79ab1126fa2556c0d5d.webp',
+      image: 'https://iberhit-assets.lon1.cdn.digitaloceanspaces.com/images/products/pelicula-radiante-ecofilm.webp',
       imageAlt: 'Película radiante ECOFILM',
       imagePosition: 'right'
     }
